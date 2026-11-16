@@ -1,8 +1,9 @@
-// Cloudflare Pages Function behind the "N% of players won today" line.
+// The Cloudflare Worker. Static files in dist/ are served by Workers Assets
+// without running this script; only /api/* reaches it (see wrangler.jsonc).
 // GET  /api/stats?date=YYYY-MM-DD -> { date, played, wins }
 // POST /api/stats { date, won }   -> 204; one result per visitor per day
-// Results live in D1 (binding DB, table in migrations/). Visitors are a salted
-// hash of their IP and the date, so no address is stored.
+// Results live in D1 (binding DB, table in migrations/). Visitors are a hash of
+// a secret salt, the date and their IP, so no address is stored.
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 const json = (body, status = 200, headers = {}) => Response.json(body, { status, headers });
 
@@ -37,3 +38,12 @@ export async function onRequestPost({ request, env }) {
 }
 
 export { plausible };
+
+export default {
+  fetch(request, env) {
+    if (new URL(request.url).pathname !== '/api/stats') return json({ error: 'not found' }, 404);
+    if (request.method === 'GET') return onRequestGet({ request, env });
+    if (request.method === 'POST') return onRequestPost({ request, env });
+    return json({ error: 'method not allowed' }, 405, { allow: 'GET, POST' });
+  },
+};

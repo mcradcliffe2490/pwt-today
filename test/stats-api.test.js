@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { onRequestGet, onRequestPost, plausible } from '../functions/api/stats.js';
+import worker, { onRequestGet, onRequestPost, plausible } from '../worker/index.js';
 
 // Just enough of D1 for the two statements the function runs.
 function fakeDb() {
@@ -45,5 +45,12 @@ describe('stats function', () => {
     const now = Date.parse('2026-11-16T12:00:00Z');
     expect(['2026-11-15', '2026-11-16', '2026-11-17'].every((d) => plausible(d, now))).toBe(true);
     expect(plausible('2026-11-14', now)).toBe(false);
+  });
+
+  it('routes only /api/stats', async () => {
+    const env = { DB: fakeDb() };
+    expect((await worker.fetch(new Request(`https://pwt-today.com/api/stats?date=${today}`), env)).status).toBe(200);
+    expect((await worker.fetch(new Request('https://pwt-today.com/api/other'), env)).status).toBe(404);
+    expect((await worker.fetch(new Request('https://pwt-today.com/api/stats', { method: 'PUT' }), env)).status).toBe(405);
   });
 });
