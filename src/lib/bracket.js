@@ -17,11 +17,6 @@ export function dailyTeam(date) {
   return shuffle(structuredClone(PLAYERS), random).slice(0, TEAM_SIZE);
 }
 
-// Practice runs use today's three in a random order (the first is the default lead).
-export function practiceTeam(date, seed) {
-  return shuffle(dailyTeam(date), mulberry32(hashString(`${seed}:practice-order`)));
-}
-
 // The cups a day can be, with the seven-NPC field each one draws, as the game's
 // built-in constructors do: a regional cup draws seven of that region's Leaders,
 // World Leaders draws seven of all 46 Leaders (who bring their World Leaders

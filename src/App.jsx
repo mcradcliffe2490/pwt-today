@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Battle } from './screens/Battle.jsx';
 import { Lobby } from './screens/Lobby.jsx';
 import { Result } from './screens/Result.jsx';
-import { POOL_VERSION, dailyTeam, dailyTournament, practiceTeam } from './lib/bracket.js';
+import { POOL_VERSION, dailyTeam, dailyTournament } from './lib/bracket.js';
 import { formatCountdown, msUntilMidnight, puzzleNumber, shortDate, today as getToday } from './lib/date.js';
 import { isReloading, reloadOnce } from './lib/staleReload.js';
 import { STORE_KEY, journalFor, lockDay, savePractice, saveJournal, saveResult, view, voidDay, voidStaleBattles } from './lib/storage.js';
@@ -105,10 +105,10 @@ export function App() {
         mode,
         date: d,
         seed: journal?.seed || seed,
-        team: journal?.initialTeam || (mode === 'daily' ? dailyTeam(d) : practiceTeam(d, seed)),
+        team: journal?.initialTeam || dailyTeam(d),
         bracket: journal?.bracket || t.bracket,
         cup: journal?.cup || t.cup.name,
-        lead: journal?.initialLead ?? (mode === 'daily' && d === today ? lead : 0),
+        lead: journal?.initialLead ?? (d === today ? lead : 0),
         saved: journal || undefined,
         startedAt: journal?.startedAt || Date.now(),
         key: crypto.randomUUID(),

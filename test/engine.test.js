@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { TournamentEngine } from '../src/battle/engine.js';
 import { fillCall, resultCall } from '../src/battle/narrate.js';
-import { CUPS, FIELD, PLAYERS, ROUNDS, TEAM_SIZE, TRAINERS, dailyBracket, dailyTeam, dailyTournament, practiceTeam } from '../src/lib/bracket.js';
+import { CUPS, FIELD, PLAYERS, ROUNDS, TEAM_SIZE, TRAINERS, dailyBracket, dailyTeam, dailyTournament } from '../src/lib/bracket.js';
 import { puzzleNumber } from '../src/lib/date.js';
 import { shareText } from '../src/lib/share.js';
 
@@ -36,11 +36,6 @@ describe('daily draw', () => {
     expect(new Set(a.map((m) => m.name)).size).toBe(TEAM_SIZE);
     expect(a.map((m) => m.name)).toEqual(dailyTeam('2026-11-17').map((m) => m.name));
     expect(dailyTeam('2026-11-18').map((m) => m.name)).not.toEqual(a.map((m) => m.name));
-  });
-
-  it('practice teams are a reordering of the daily three', () => {
-    const names = dailyTeam('2026-11-17').map((m) => m.name).sort();
-    expect(practiceTeam('2026-11-17', 'x').map((m) => m.name).sort()).toEqual(names);
   });
 
   it('builds a bracket of three distinct trainers with three of their own Pokémon each', () => {
