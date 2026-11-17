@@ -194,6 +194,22 @@ export function savePractice(date, result, log) {
   return save(store);
 }
 
+// The lead picked in the lobby, remembered for the rest of that day.
+const LEAD_KEY = 'pwttoday_lead';
+export function loadLead(date) {
+  try {
+    const saved = JSON.parse(localStorage.getItem(LEAD_KEY));
+    return saved?.date === date && Number.isInteger(saved.lead) && saved.lead >= 0 && saved.lead < TEAM_SIZE ? saved.lead : 0;
+  } catch {
+    return 0;
+  }
+}
+export function saveLead(date, lead) {
+  try {
+    localStorage.setItem(LEAD_KEY, JSON.stringify({ date, lead }));
+  } catch {}
+}
+
 // --- one tab at a time ---------------------------------------------------------
 const lockName = (date) => `pwttoday:${date}`;
 

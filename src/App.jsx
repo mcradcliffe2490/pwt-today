@@ -8,7 +8,7 @@ import { Result } from './screens/Result.jsx';
 import { POOL_VERSION, dailyTeam, dailyTournament } from './lib/bracket.js';
 import { formatCountdown, msUntilMidnight, puzzleNumber, shortDate, today as getToday } from './lib/date.js';
 import { isReloading, reloadOnce } from './lib/staleReload.js';
-import { STORE_KEY, journalFor, lockDay, savePractice, saveJournal, saveResult, view, voidDay, voidStaleBattles } from './lib/storage.js';
+import { STORE_KEY, journalFor, loadLead, lockDay, saveLead, savePractice, saveJournal, saveResult, view, voidDay, voidStaleBattles } from './lib/storage.js';
 import { useNow } from './components/ui.jsx';
 
 function Header({ no, today, onLobby }) {
@@ -35,7 +35,7 @@ function Header({ no, today, onLobby }) {
 export function App() {
   const [today, setToday] = useState(getToday);
   const [store, setStore] = useState(() => view(today));
-  const [lead, setLead] = useState(0);
+  const [lead, setLead] = useState(() => loadLead(today));
   const [screen, setScreen] = useState('lobby');
   const [run, setRun] = useState(null);
   const [result, setResult] = useState(null);
@@ -50,7 +50,7 @@ export function App() {
     const refresh = () => {
       const d = getToday();
       setToday((prev) => {
-        if (prev !== d) setLead(0);
+        if (prev !== d) setLead(loadLead(d));
         return d;
       });
       setStore(view(d));
@@ -179,7 +179,10 @@ export function App() {
           team={team}
           tournament={tournament}
           lead={lead}
-          setLead={setLead}
+          setLead={(i) => {
+            setLead(i);
+            saveLead(today, i);
+          }}
           store={store}
           resumable={store.today?.status === 'started'}
           onStart={() => start('daily')}

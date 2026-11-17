@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it } from 'vitest';
 import { POOL_VERSION, dailyBracket, dailyTeam } from '../src/lib/bracket.js';
-import { STORE_KEY, load, savePractice, saveResult, saving, view } from '../src/lib/storage.js';
+import { STORE_KEY, load, loadLead, saveLead, savePractice, saveResult, saving, view } from '../src/lib/storage.js';
 
 const date = '2026-11-16';
 const result = (won) => ({
@@ -87,5 +87,14 @@ describe('storage', () => {
     expect(runs.map((r) => r.no)).toEqual([3, 4, 5, 6, 7, 8, 9, 10]);
     expect(runs.at(-1).log).toEqual(['Turn 1', 'line 9']);
     expect(view('2026-11-15').practice).toEqual([]);
+  });
+
+  it('remembers the lobby lead for that day only', () => {
+    expect(loadLead(date)).toBe(0);
+    saveLead(date, 2);
+    expect(loadLead(date)).toBe(2);
+    expect(loadLead('2026-11-17')).toBe(0);
+    localStorage.setItem('pwttoday_lead', '{"date":"2026-11-16","lead":7}');
+    expect(loadLead(date)).toBe(0);
   });
 });
